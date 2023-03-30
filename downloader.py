@@ -1,4 +1,4 @@
-import requests, urllib, asyncio
+import requests, urllib, asyncio, hashlib
 from tqdm import tqdm
 from pathlib import Path
 from bs4 import BeautifulSoup as bs
@@ -67,9 +67,15 @@ async def main():
         tasks.append(
             start_downloading(urls_part)
         )
-
     await asyncio.gather(*tasks)
-    print('Files downloaded.')
+
+    print('Files downloaded. Calculating hashes...')
+    print('{:<32} {:<64}'.format('File', 'SHA256 Hash'))
+    paths = ['/'.join(parse_path(url)) for url in urls]
+    for path in paths:
+        with open('temp_repo/' + path, 'rb') as file:
+            file_hash = hashlib.sha256(file.read()).hexdigest()
+        print(f'{path:<32} {file_hash:<64}')
 
 
 if __name__ == "__main__":

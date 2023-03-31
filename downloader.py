@@ -73,10 +73,14 @@ def download_file(url):
     Path(download_path).mkdir(parents=True, exist_ok=True)
 
     filename = parsed_path[-1]
+    responce = requests.get(download_url, timeout=5)
+
+    if responce.status_code != 200:
+        raise ValueError('Wrong url for download file.')
 
     with open('/'.join([download_path, filename]), 'wb') as repo_file:
         repo_file.write(
-            requests.get(download_url, timeout=5).content,
+            responce.content,
         )
 
 
@@ -113,7 +117,7 @@ async def main():
     urls = parse_file_urls(
         'https://gitea.radium.group/radium/project-configuration/',
     )
-
+    print(urls)
     print('Downloading files..')
     splitted_list = []
     for part in range(0, 3):
